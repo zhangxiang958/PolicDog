@@ -1,0 +1,19 @@
+{
+  "name": "policedog",
+  "version": "1.0.0",
+  "description": "a script to monitor web performance",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhangxiang958/PolicDog.git"
+  },
+  "author": "zhangxiang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhangxiang958/PolicDog/issues"
+  },
+  "homepage": "https://github.com/zhangxiang958/PolicDog#readme"
+}
