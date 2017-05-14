@@ -23,6 +23,12 @@ Javascript 渲染时间
 可以上报到服务器上
 
 
+参考:
+http://blogread.cn/it/article/6967
+https://github.com/fredshare/blog/issues/5
+https://www.w3.org/TR/navigation-timing-2/#introduction
+
+
 
 
 
