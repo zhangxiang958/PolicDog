@@ -28,6 +28,20 @@ http://blogread.cn/it/article/6967
 https://github.com/fredshare/blog/issues/5
 https://www.w3.org/TR/navigation-timing-2/#introduction
 
+相关文章：
+http://div.io/topic/736
+1.研究首屏时间？你先要知道这几点细节
+http://www.alloyteam.com/2016/01/points-about-resource-loading/
+
+2.初探performance - 监控网页与程序性能
+http://www.alloyteam.com/2015/09/explore-performance/
+
+3.7天打造前端性能监控系统
+http://div.io/topic/749
+
+4.网页性能管理详解
+http://mp.weixin.qq.com/s?__biz=MzA5NTM2MTEzNw==&mid=376711329&idx=1&sn=ab20a7431752ea46a2630dbc303c7b82&scene=2&srcid=0918dvJ6cSV39oDyRrXMXar9#rd
+
 
 
 
