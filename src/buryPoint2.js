@@ -96,13 +96,13 @@
         return staticSourceInfo;
     }
 
-    policeReport['staticResource loadSituation'] = toAnalysisStaticResource(perf);
+    report['staticResource loadSituation'] = toAnalysisStaticResource(perf);
 
     /**
      * to count the DNS Query time
      */
     let DNSquery = resource.domainLookupEnd - resource.domainLookupStart;
-    policeReport['DNS Query'] = DNSquery;
+    report['DNS Query'] = DNSquery;
 
 
 
@@ -110,7 +110,7 @@
      *to count the TCP connect time
      */
     let TCPconnect = resource.connectEnd - resource.connectStart;
-    policeReport['TCP Connect'] = TCPconnect;
+    report['TCP Connect'] = TCPconnect;
 
 
     /**
@@ -123,28 +123,28 @@
      * to count the response time
      */
     let responseTime = resource.responseEnd - resource.responseStart;
-    policeReport['Request Time'] = responseTime;
+    report['Request Time'] = responseTime;
 
 
     /**
      * 白屏时间
      */
     let whiteTime = resource.responseStart - resource.navigationStart;
-    policeReport['WhiteScreen Time'] = whiteTime;
+    report['WhiteScreen Time'] = whiteTime;
 
 
     /**
      * 解析 DOM 树耗费时间
      */
     let DOMAnalysis = resource.domContentLoadedEventEnd - resource.navigationStart;
-    policeReport['DOM Analysis'] = DOMAnalysis;
+    report['DOM Analysis'] = DOMAnalysis;
 
 
     /**
      * load time
      */
     let loadTime = resource.loadEventEnd - resource.navigationStart;
-    policeReport['Load Time'] = loadTime;
+    report['Load Time'] = loadTime;
 
     console.log(policeReport);
     //分开 IE 与高级浏览器
