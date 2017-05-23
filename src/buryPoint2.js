@@ -1,53 +1,66 @@
 /**
  * @file: PoliceDog web performance script for client side
- * @author by zhangxiang
- * @update 2017.05
+ * @author: zhangxiang
+ * @updated: 2017.05
  */
 
 (function(){
+    let win = window;
     
+    win.webPerf = {
+        bowser: '',
+        appVersion: '',
+        system: '',
+        perf: null
+    };
+
     /**
      * Browser compatibility:
      * Some brower cannot handle the interface(window.performance), so we must add some code to compatibile some bowser
      * 
      */
+    function fallback(){
+
+        if(win.addEventListener){
+
+            win.addEventListener('load', function(){
 
 
-    if(window.addEventListener){
+            });
 
-        window.addEventListener('load', function(){
+        } else if(win.attachEvent) {
 
+            win.attachEvent('onload', function(){
 
-        });
-
-    } else if(window.attachEvent) {
-
-        window.attachEvent('onload', function(){
-
-        });
-        
-    } else {
-
-        if(window.onload) {
-
-            let loadFunc = window.onload;
-
-            window.onload = function(){
-
-
-                /**do some thing */
-                
-                loadFunc();
-            }
-
+            });
+            
         } else {
-            window.onload = function(){
-                /**do something */
+
+            if(win.onload) {
+
+                let loadFunc = window.onload;
+
+                win.onload = function(){
+
+
+                    /**do some thing */
+                    
+                    loadFunc();
+                }
+
+            } else {
+                win.onload = function(){
+                    /**do something */
+
+                }
             }
+
         }
-
     }
-
+    
+    /**
+     * use the window.performance interface
+     */
     function getPerformance(){
         let perf = null;
         
@@ -62,12 +75,18 @@
     function toAnalysisStaticResource(perf){
 
         let entries = perf.getEntries();
-        let javascriptNum = 0, cssNum = 0, imgNum = 0, javascriptTime = 0, cssTime = 0, imgTime = 0;
+        let javascriptNum = 0, cssNum = 0, imgNum = 0, javascriptTime = 0, cssTime = 0, imgTime = 0, QueryArr = [];
 
         entries.forEach(function(data, i){
+            let name            = data.name;
+            let initiatorType   = data.initiatorType;
+
+            let DNSQuery        = data.domainLookupEnd - data.domainLookupStart;
+            let connectTime     = data.connectEnd - data.connectStart;
+            let loadTime        = data.duration;
 
             //to count time of the different type of resource
-            switch (data.initiatorType) {
+            switch (initiatorType) {
                 case 'script': 
                     javascriptNum ++;
                     javascriptTime += data.responseEnd - data.startTime
@@ -80,7 +99,15 @@
                     imgNum ++;
                     imgTime += data.responseEnd - data.startTime;
                     break;
-            } 
+            }
+
+            QueryArr.push({
+                name: name,
+                type: initiatorType,
+                DNSQuery: DNSquery,
+                connectTime: connectTime,
+                loadTime: loadTime
+            });
         });
 
         const staticSourceInfo = {
@@ -90,62 +117,81 @@
             'imgNum': imgNum,
             'javascriptUseTime': javascriptTime,
             'cssUseTime': cssTime,
-            'imgUsetime': imgTime
+            'imgUsetime': imgTime,
+            'SourceQuery': QueryArr
         }
 
         return staticSourceInfo;
     }
 
-    report['staticResource loadSituation'] = toAnalysisStaticResource(perf);
+    /**
+     * to count the time of whole page
+     */
+    function countTime(resource) {
+
+        let report = {};
+        report['staticResource loadSituation'] = toAnalysisStaticResource(perf);
+
+        /**
+         * to count the DNS Query time
+         */
+        let DNSquery = resource.domainLookupEnd - resource.domainLookupStart;
+        report['DNS Query'] = DNSquery;
+
+
+
+        /**
+         *to count the TCP connect time
+         */
+        let TCPconnect = resource.connectEnd - resource.connectStart;
+        report['TCP Connect'] = TCPconnect;
+
+
+        /**
+         * to count the request time 
+         */
+        let requestTime = resource.requestEnd - resource.requestStart;
+
+
+        /**
+         * to count the response time
+         */
+        let responseTime = resource.responseEnd - resource.responseStart;
+        report['Request Time'] = responseTime;
+
+
+        /**
+         * 白屏时间
+         */
+        let whiteTime = resource.responseStart - resource.navigationStart;
+        report['WhiteScreen Time'] = whiteTime;
+
+
+        /**
+         * 解析 DOM 树耗费时间
+         */
+        let DOMAnalysis = resource.domContentLoadedEventEnd - resource.navigationStart;
+        report['DOM Analysis'] = DOMAnalysis;
+
+
+        /**
+         * load time
+         */
+        let loadTime = resource.loadEventEnd - resource.navigationStart;
+        report['Load Time'] = loadTime;
+    }
 
     /**
-     * to count the DNS Query time
+     * is ios or android
      */
-    let DNSquery = resource.domainLookupEnd - resource.domainLookupStart;
-    report['DNS Query'] = DNSquery;
-
-
+    
+    /**
+     * to get the version of bowser
+     */
 
     /**
-     *to count the TCP connect time
+     * to get the name of bowser
      */
-    let TCPconnect = resource.connectEnd - resource.connectStart;
-    report['TCP Connect'] = TCPconnect;
-
-
-    /**
-     * to count the request time 
-     */
-    let requestTime = resource.requestEnd - resource.requestStart;
-
-
-    /**
-     * to count the response time
-     */
-    let responseTime = resource.responseEnd - resource.responseStart;
-    report['Request Time'] = responseTime;
-
-
-    /**
-     * 白屏时间
-     */
-    let whiteTime = resource.responseStart - resource.navigationStart;
-    report['WhiteScreen Time'] = whiteTime;
-
-
-    /**
-     * 解析 DOM 树耗费时间
-     */
-    let DOMAnalysis = resource.domContentLoadedEventEnd - resource.navigationStart;
-    report['DOM Analysis'] = DOMAnalysis;
-
-
-    /**
-     * load time
-     */
-    let loadTime = resource.loadEventEnd - resource.navigationStart;
-    report['Load Time'] = loadTime;
-
-    console.log(policeReport);
-    //分开 IE 与高级浏览器
+     
+    
 })();

@@ -5,14 +5,23 @@
 ## web 性能指标
 
 白屏时间
+
 首屏时间
+
 用户可操作时间
+
 资源总下载时间
+
 DNS 解析时间
+
 TCP 连接时间
+
 HTTP 请求时间
+
 HTTP 响应时间
+
 CSS 渲染时间
+
 Javascript 渲染时间
 
 ## 为什么要关注这些指标
@@ -30,7 +39,6 @@ https://www.w3.org/TR/navigation-timing-2/#introduction
 
 相关文章：
 
-http://div.io/topic/736
 
 1.研究首屏时间？你先要知道这几点细节
 
