@@ -28,14 +28,8 @@ Javascript 渲染时间
 如果我们能够将网页加载的时间准确地获取, 那么我们就可以清晰地分析出网页加载性能的瓶颈, 从而解决瓶颈, 使网页秒开, 提升用户体验.
 
 ## 用法
-可以得到关于网页加载的信息, 并且可以自行设定或者使用默认的性能指标计划来确定网页是否达到标准
-可以上报到服务器上
+可以得到关于网页加载的信息, 并上报到服务器上.
 
-
-参考:
-http://blogread.cn/it/article/6967
-https://github.com/fredshare/blog/issues/5
-https://www.w3.org/TR/navigation-timing-2/#introduction
 
 相关文章：
 
@@ -55,6 +49,10 @@ http://div.io/topic/749
 4.网页性能管理详解
 
 http://mp.weixin.qq.com/s?__biz=MzA5NTM2MTEzNw==&mid=376711329&idx=1&sn=ab20a7431752ea46a2630dbc303c7b82&scene=2&srcid=0918dvJ6cSV39oDyRrXMXar9#rd
+
+5.Navigation Level 2
+
+https://www.w3.org/TR/navigation-timing-2/#introduction
 
 
 
