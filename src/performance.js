@@ -1,7 +1,7 @@
 /**
  * @file: PoliceDog web performance script for client side
  * @author: zhangxiang
- * @updated: 2017.05
+ * @updated: 2017.05.29 14:29
  */
 
 (function(){
