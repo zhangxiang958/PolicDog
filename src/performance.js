@@ -159,7 +159,7 @@
         var perfData        = webPerf.minimize();
         perfData.pid        = pid;
         perfData.currentURL = currentURL;
-        perfData.timestamp  = new Date();
+        perfData.timestamp  = new Date().getTime();
         
         var url = '', query = '?' + JSON.stringify(perfData);
 
