@@ -128,7 +128,7 @@
 
             data = {
                 userAgent: navigator.userAgent,
-                sourceInfo: sourceInfo.sourceQueue,
+                sourceInfo: sourceInfo,
                 loadInfo: loadInfo
             }
 
