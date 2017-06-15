@@ -37,7 +37,7 @@
 
     win.webPerf = {
         perf: (function(){
-            let perf = null;
+            var perf = null;
         
             perf = win.performance ? win.performance : (win.wekitPerformance ? win.webkitPerformance : win.msPerformance);
 
@@ -48,16 +48,16 @@
                 return null;
             }
 
-            let entries = this.perf.getEntries();
-            let javascriptNum = 0, cssNum = 0, imgNum = 0, javascriptTime = 0, cssTime = 0, imgTime = 0, QueryArr = [];
+            var entries = this.perf.getEntries();
+            var javascriptNum = 0, cssNum = 0, imgNum = 0, javascriptTime = 0, cssTime = 0, imgTime = 0, QueryArr = [];
 
             entries.forEach(function(data, i){
-                let name            = data.name;
-                let initiatorType   = data.initiatorType;
+                var name            = data.name;
+                var initiatorType   = data.initiatorType;
 
-                let DNSQuery        = data.domainLookupEnd - data.domainLookupStart;
-                let connectTime     = data.connectEnd - data.connectStart;
-                let loadTime        = data.duration;
+                var DNSQuery        = data.domainLookupEnd - data.domainLookupStart;
+                var connectTime     = data.connectEnd - data.connectStart;
+                var loadTime        = data.duration;
 
                 //to count time of the different type of resource
                 switch (initiatorType) {
@@ -84,7 +84,7 @@
                 });
             });
 
-            const staticSourceInfo = {
+            var staticSourceInfo = {
                 'sourceAmount': entries.length,
                 'scriptAmount': javascriptNum,
                 'stylesheetAmount': cssNum,
@@ -102,50 +102,50 @@
                 return null;
             }
 
-            let report = {}, resource = this.perf;
+            var report = {}, resource = this.perf;
             /**
              * to count the DNS Query time
              */
-            let DNSquery = resource.domainLookupEnd - resource.domainLookupStart;
+            var DNSquery = resource.domainLookupEnd - resource.domainLookupStart;
             report['DNS Query'] = DNSquery;
 
             /**
              *to count the TCP connect time
              */
-            let TCPconnect = resource.connectEnd - resource.connectStart;
+            var TCPconnect = resource.connectEnd - resource.connectStart;
             report['TCP Connect'] = TCPconnect;
 
 
             /**
              * to count the request time 
              */
-            let requestTime = resource.requestEnd - resource.requestStart;
+            var requestTime = resource.requestEnd - resource.requestStart;
 
 
             /**
              * to count the response time
              */
-            let responseTime = resource.responseEnd - resource.responseStart;
+            var responseTime = resource.responseEnd - resource.responseStart;
             report['Request Time'] = responseTime;
 
 
             /**
              * to count white screen time
              */
-            let whiteTime = resource.responseStart - resource.navigationStart;
+            var whiteTime = resource.responseStart - resource.navigationStart;
             report['WhiteScreen Time'] = whiteTime;
 
 
             /**
              * to count analysis DOM time
              */
-            let DOMAnalysis = resource.domContentLoadedEventEnd - resource.navigationStart;
+            var DOMAnalysis = resource.domContentLoadedEventEnd - resource.navigationStart;
             report['DOM Analysis'] = DOMAnalysis;
 
             /**
              * to count load time
              */
-            let loadTime = resource.loadEventEnd - resource.navigationStart;
+            var loadTime = resource.loadEventEnd - resource.navigationStart;
             report['Load Time'] = loadTime;
 
             return report;
@@ -154,7 +154,7 @@
             /**
              * to get the version/name of bowser
              */
-             let browerName = navigator.userAgent.toLowerCase();
+             var browerName = navigator.userAgent.toLowerCase();
 
              if(/msie/i.test(browerName) && !/opera/.test(browerName)) {
 
@@ -178,13 +178,13 @@
         })(),
         isMobile: (function(){
             
-            let ua      = navigator.userAgent;
+            var ua      = navigator.userAgent;
 
-            let mobile  = !!userAgent.match(/AppleWebkit.*Mobile.*/);
-            let ios     = !!userAgent.match(/\(i[^;]+;( U;) ? CPU.+Mac OS X/);
-            let android = userAgent.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1;
-            let iPhone  = userAgent.indexOf('iPhone') > -1;
-            let iPad    = userAgent.indexOf('iPad') > -1;
+            var mobile  = !!userAgent.match(/AppleWebkit.*Mobile.*/);
+            var ios     = !!userAgent.match(/\(i[^;]+;( U;) ? CPU.+Mac OS X/);
+            var android = userAgent.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1;
+            var iPhone  = userAgent.indexOf('iPhone') > -1;
+            var iPad    = userAgent.indexOf('iPad') > -1;
 
             if(mobile || ios || android || iPhone || ipad) {
                 return true;
@@ -196,7 +196,7 @@
             /**
              * is ios or android
              */
-            let ua = navigator.userAgent;
+            var ua = navigator.userAgent;
 
             if(!!ua.match(/\(i[^;]+;( U;) ? CPU.+Mac OS X/)) {
 
@@ -209,7 +209,7 @@
         })(),
         minimize: function(){
 
-            let sourceInfo = this.sourceInfo, loadInfo = this.loadInfo, data = null;
+            var sourceInfo = this.sourceInfo, loadInfo = this.loadInfo, data = null;
 
             sourceInfo.each(function(key, val){
 
