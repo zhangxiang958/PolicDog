@@ -6,19 +6,6 @@
 
 (function(){
     let win = window;
-    
-    Object.prototype.each = function(callback){
-
-        for(var key in this) {
-            if(this.hasOwnProperty(key)) {
-
-                if(callback.call(this, key, this[key]) === false) {
-
-                    break;
-                }
-            }
-        }
-    }
 
     function addHandler(type, callback) {
 
@@ -35,98 +22,104 @@
         }
     }
 
-    win.webPerf = {
-        perf: (function(){
-            var perf = null;
+    var perf = (function(){
+        var perf = null;
         
-            perf = win.performance ? win.performance : (win.wekitPerformance ? win.webkitPerformance : win.msPerformance);
+        perf = win.performance ? win.performance : (win.wekitPerformance ? win.webkitPerformance : win.msPerformance);
 
-            return perf;
-        })(),
-        sourceInfo: (function() {
-            if(!this.perf) {
-                return null;
-            }
-            
-            var entries = this.perf.getEntries();
-            var javascriptNum = 0, cssNum = 0, imgNum = 0, javascriptTime = 0, cssTime = 0, imgTime = 0, QueryArr = [];
+        return perf;
+    })();
 
-            entries.forEach(function(data, i){
-                var name            = data.name;
-                var initiatorType   = data.initiatorType;
-                let DNSQuery        = data.domainLookupEnd - data.domainLookupStart;
-                let connectTime     = data.connectEnd - data.connectStart;
-                let duration        = data.duration;
+    var sourceInfo = (function() {
+        if(!perf) {
+            return null;
+        }
 
-                QueryArr.push({
-                    name: name,
-                    type: initiatorType,
-                    DNSQuery: DNSquery,
-                    duration: duration,
-                    connectTime: connectTime
-                });
+        var entries = perf.getEntries();
+        var javascriptNum = 0, cssNum = 0, imgNum = 0, javascriptTime = 0, cssTime = 0, imgTime = 0, QueryArr = [];
+
+        entries.forEach(function(data, i){
+            var name            = data.name;
+            var initiatorType   = data.initiatorType;
+            let DNSQuery        = data.domainLookupEnd - data.domainLookupStart;
+            let connectTime     = data.connectEnd - data.connectStart;
+            let duration        = data.duration;
+
+            QueryArr.push({
+                name: name,
+                type: initiatorType,
+                DNSQuery: DNSQuery,
+                duration: duration,
+                connectTime: connectTime
             });
+        });
 
-            return QueryArr;
-        })(),
-        loadInfo: (function(){
-            if(!this.perf) {
-                return null;
-            }
+        return QueryArr;
+    })();
 
-            var report = {}, resource = this.perf;
-            /**
-             * to count the DNS Query time
-             */
-            var DNSquery = resource.domainLookupEnd - resource.domainLookupStart;
-            report['DNS Query'] = DNSquery;
+    var loadInfo = (function(){
+        if(!perf) {
+            return null;
+        }
 
-            /**
-             *to count the TCP connect time
-             */
-            var TCPconnect = resource.connectEnd - resource.connectStart;
-            report['TCP Connect'] = TCPconnect;
+        var report = {}, resource = perf.timing;
+        /**
+         * to count the DNS Query time
+         */
+        var DNSquery = resource.domainLookupEnd - resource.domainLookupStart;
+        report['DNS Query'] = DNSquery;
 
-
-            /**
-             * to count the TTFB time 
-             */
-            var TTFB = resource.responseStart - resource.navigationStart;
-            report['TTFB'] = TTFB;
-
-            /**
-             * to count the response time
-             */
-            var responseTime = resource.responseEnd - resource.responseStart;
-            report['Request Time'] = responseTime;
+        /**
+         *to count the TCP connect time
+         */
+        var TCPconnect = resource.connectEnd - resource.connectStart;
+        report['TCP Connect'] = TCPconnect;
 
 
-            /**
-             * to count white screen time
-             */
-            var whiteTime = resource.responseStart - resource.navigationStart;
-            report['WhiteScreen Time'] = whiteTime;
+        /**
+         * to count the TTFB time 
+         */
+        var TTFB = resource.responseStart - resource.navigationStart;
+        report['TTFB'] = TTFB;
+
+        /**
+         * to count the response time
+         */
+        var responseTime = resource.responseEnd - resource.responseStart;
+        report['Request Time'] = responseTime;
 
 
-            /**
-             * to count analysis DOM time
-             */
-            var DOMAnalysis = resource.domContentLoadedEventEnd - resource.navigationStart;
-            report['DOM Analysis'] = DOMAnalysis;
+        /**
+         * to count white screen time
+         */
+        var whiteTime = resource.responseStart - resource.navigationStart;
+        report['WhiteScreen Time'] = whiteTime;
 
-            /**
-             * to count load time
-             */
-            var loadTime = resource.loadEventEnd - resource.navigationStart;
-            report['Load Time'] = loadTime;
 
-            return report;
-        })(),
+        /**
+         * to count analysis DOM time
+         */
+        var DOMAnalysis = resource.domContentLoadedEventEnd - resource.navigationStart;
+        report['DOM Analysis'] = DOMAnalysis;
+
+        /**
+         * to count load time
+         */
+        var loadTime = resource.loadEventEnd - resource.navigationStart;
+        report['Load Time'] = loadTime;
+
+        return report;
+    })();
+
+    win.webPerf = {
+        perf: perf,
+        sourceInfo: sourceInfo,
+        loadInfo: loadInfo,
         minimize: function(){
 
             var sourceInfo = this.sourceInfo, loadInfo = this.loadInfo, data = null;
 
-            loadInfo.each(function(key, val){
+            Object.keys(loadInfo).map(function(key, val){
 
                 if(val === 0) {
                     delete this[key];
