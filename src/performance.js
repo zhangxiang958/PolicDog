@@ -47,55 +47,27 @@
             if(!this.perf) {
                 return null;
             }
-
+            
             var entries = this.perf.getEntries();
             var javascriptNum = 0, cssNum = 0, imgNum = 0, javascriptTime = 0, cssTime = 0, imgTime = 0, QueryArr = [];
 
             entries.forEach(function(data, i){
                 var name            = data.name;
                 var initiatorType   = data.initiatorType;
-
-                var DNSQuery        = data.domainLookupEnd - data.domainLookupStart;
-                var connectTime     = data.connectEnd - data.connectStart;
-                var loadTime        = data.duration;
-
-                //to count time of the different type of resource
-                switch (initiatorType) {
-                    case 'script': 
-                        javascriptNum ++;
-                        javascriptTime += data.responseEnd - data.startTime
-                        break;
-                    case 'css':
-                        cssNum ++;
-                        cssTime += data.responseEnd - data.startTime;
-                        break;
-                    case 'img':
-                        imgNum ++;
-                        imgTime += data.responseEnd - data.startTime;
-                        break;
-                }
+                let DNSQuery        = data.domainLookupEnd - data.domainLookupStart;
+                let connectTime     = data.connectEnd - data.connectStart;
+                let duration        = data.duration;
 
                 QueryArr.push({
                     name: name,
                     type: initiatorType,
                     DNSQuery: DNSquery,
-                    connectTime: connectTime,
-                    loadTime: loadTime
+                    duration: duration,
+                    connectTime: connectTime
                 });
             });
 
-            var staticSourceInfo = {
-                'sourceAmount': entries.length,
-                'scriptAmount': javascriptNum,
-                'stylesheetAmount': cssNum,
-                'imageAmount': imgNum,
-                'scriptLoad': javascriptTime,
-                'stylesheetLoad': cssTime,
-                'imageLoad': imgTime,
-                'sourceQueue': QueryArr
-            }
-
-            return staticSourceInfo;
+            return QueryArr;
         })(),
         loadInfo: (function(){
             if(!this.perf) {
@@ -117,10 +89,10 @@
 
 
             /**
-             * to count the request time 
+             * to count the TTFB time 
              */
-            var requestTime = resource.requestEnd - resource.requestStart;
-
+            var TTFB = resource.responseStart - resource.navigationStart;
+            report['TTFB'] = TTFB;
 
             /**
              * to count the response time
@@ -150,76 +122,9 @@
 
             return report;
         })(),
-        bowser: (function(){
-            /**
-             * to get the version/name of bowser
-             */
-             var browerName = navigator.userAgent.toLowerCase();
-
-             if(/msie/i.test(browerName) && !/opera/.test(browerName)) {
-
-                 return 'IE';
-             } else if(/firefox/i.test(browerName)){
-
-                 return 'firefox';
-             } else if (/chrome/i.test(browerName) && /webkit/i.test(browerName) && /mozilla/i.test(browerName)) {
-
-                 return 'chrome'
-             } else if(/opera/i.test(browerName)) {
-
-                 return 'opera';
-             } else if(/webkit/i.test(browerName) && !(/chrome/i.test(browerName) && /webkit/i.test(browerName) && /mozilla/i.test(browerName))){
-
-                return 'safari';
-             } else {
-
-                 return 'unknow';
-             }
-        })(),
-        isMobile: (function(){
-            
-            var ua      = navigator.userAgent;
-
-            var mobile  = !!userAgent.match(/AppleWebkit.*Mobile.*/);
-            var ios     = !!userAgent.match(/\(i[^;]+;( U;) ? CPU.+Mac OS X/);
-            var android = userAgent.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1;
-            var iPhone  = userAgent.indexOf('iPhone') > -1;
-            var iPad    = userAgent.indexOf('iPad') > -1;
-
-            if(mobile || ios || android || iPhone || ipad) {
-                return true;
-            }
-
-            return false;
-        })(),
-        isIOSorAndroid: (function(){
-            /**
-             * is ios or android
-             */
-            var ua = navigator.userAgent;
-
-            if(!!ua.match(/\(i[^;]+;( U;) ? CPU.+Mac OS X/)) {
-
-                return 'IOS';
-            } else if(ua.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1) {
-
-                return 'Android';
-            }
-
-        })(),
         minimize: function(){
 
             var sourceInfo = this.sourceInfo, loadInfo = this.loadInfo, data = null;
-
-            sourceInfo.each(function(key, val){
-
-                if(val === 0) {
-                    delete this[key];
-                }
-                if(key === 'sourceQueue') {
-                    (val.length === 0) && (delete this[key]);
-                }
-            });
 
             loadInfo.each(function(key, val){
 
@@ -228,18 +133,13 @@
                 }
             }); 
 
-            sourceInfo  = JSON.stringify(sourceInfo);
-            loadInfo    = JSON.stringify(loadInfo);
-            
             data = {
-                bowser: this.bowser,
-                isMobile: this.isMobile,
-                isIOSorAndroid: this.isIOSorAndroid,
-                sourceInfo: sourceInfo,
+                userAgent: navigator.userAgent,
+                sourceInfo: sourceInfo.sourceQueue,
                 loadInfo: loadInfo
             }
 
-            return JSON.stringify(data);
+            return data;
         }
     };
 
@@ -248,8 +148,19 @@
      * send data
      */
      addHandler('loaded', function(){
+        
+        var scripts         = document.getElementsByTagName('script');
+        var thisScriptSrc   = scripts[scripts.length - 1].src; 
+        var pid             = thisScriptSrc.slice(thisScriptSrc.indexOf('?') + 1).split('=')[1];
+        
+        var currentURL      = window.location.href;
 
-        var url = '', query = '?' + webPerf.minimize();
+        var perfData        = webPerf.minimize();
+        perfData.pid        = pid;
+        perfData.currentURL = currentURL;
+        perfData.timestamp  = new Date().getTime();
+        
+        var url = '', query = '?' + JSON.stringify(perfData);
 
         (new Image()).src = url + query;
      });
