@@ -5,7 +5,7 @@
  */
 
 (function(){
-    let win = window;
+    var win = window;
 
     function addHandler(type, callback) {
 
