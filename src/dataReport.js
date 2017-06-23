@@ -31,7 +31,8 @@
     })();
 
     var sourceInfo = (function() {
-        if(!perf) {
+        // Unfortunately Safari does not support ResourceTiming yet, so we'll just need to wait for them to support it.
+        if(!perf || !perf.getEntries) {
             return null;
         }
 
@@ -149,56 +150,66 @@
     /**
      * send data
      */
-     addHandler('loaded', function(){
-        var jsLoad = 0, 
-            jsDNSQuery = 0, 
-            jsAmount = 0;
-            stylesheetLoad = 0, 
-            stylesheetDNSQuery = 0, 
-            stylesheetAmount = 0,
-            imgLoad = 0,
-            imgDNSQuery = 0,
-            imgAmount = 0;
-
-        sourceInfo.forEach(function(data, i){
-            switch (data.type){
-                case 'script':
-                    jsLoad += data.duration;
-                    jsDNSQuery += data.DNSQuery;
-                    jsAmount ++;
-                    break;
-                case 'link':
-                    stylesheetLoad += data.duration;
-                    stylesheetDNSQuery += data.DNSQuery;
-                    stylesheetAmount ++;
-                    break;
-                case 'img':
-                    imgLoad += data.duration;
-                    imgDNSQuery += data.DNSQuery;
-                    imgAmount++;
-                    break;
-            }
-        });
-        var sourceTime = {
-            jsLoad: jsLoad,
-            jsDNSQuery: jsDNSQuery,
-            jsAmount: jsAmount,
-            stylesheetLoad: stylesheetLoad,
-            stylesheetDNSQuery: stylesheetDNSQuery,
-            stylesheetAmount: stylesheetAmount,
-            imgLoad: imgLoad,
-            imgDNSQuery: imgDNSQuery,
-            imgAmount: imgAmount
+     var jsLoad = 0, 
+        jsDNSQuery = 0, 
+        jsAmount = 0;
+        stylesheetLoad = 0, 
+        stylesheetDNSQuery = 0, 
+        stylesheetAmount = 0,
+        imgLoad = 0,
+        imgDNSQuery = 0,
+        imgAmount = 0.
+        xhrDNSQuery = 0,
+        xhrload = 0,
+        xhrAmount = 0;
+    
+    sourceInfo && sourceInfo.forEach(function(data, i){
+        switch (data.type){
+            case 'script':
+                jsLoad += data.duration;
+                jsDNSQuery += data.DNSQuery;
+                jsAmount ++;
+                break;
+            case 'link':
+                stylesheetLoad += data.duration;
+                stylesheetDNSQuery += data.DNSQuery;
+                stylesheetAmount ++;
+                break;
+            case 'img':
+                imgLoad += data.duration;
+                imgDNSQuery += data.DNSQuery;
+                imgAmount++;
+                break;
+            case 'xmlhttprequest':
+                xhrDNSQuery += data.DNSQuery;
+                xhrload += data.duration;
+                xhrAmount++;
+                break;
         }
-        console.log(sourceTime);
-            
-        //页面加载信息，分为三个字段上报：页面整体加载时间，DNS 查询时间，TTFB
-        ga('send', 'timing', 'pageload', 'load', loadInfo.LoadTime);
-        ga('send', 'timing', 'pageload', 'DNSQuery', loadInfo.DNSQuery);
-        ga('send', 'timing', 'pageload', 'TTFB', loadInfo.TTFB);
-        //静态资源上报: Js 加载时间，DNS 查询时间，TTFB 时间以及 js 文件个数
-        // 样式表 加载时间， DNS 查询时间， TTFB， stylesheel 文件个数
-        // 图片 加载时间， DNS 查询时间， 图片个数
+    });
+    var sourceTime = {
+        jsLoad: jsLoad,
+        jsDNSQuery: jsDNSQuery,
+        jsAmount: jsAmount,
+        stylesheetLoad: stylesheetLoad,
+        stylesheetDNSQuery: stylesheetDNSQuery,
+        stylesheetAmount: stylesheetAmount,
+        imgLoad: imgLoad,
+        imgDNSQuery: imgDNSQuery,
+        imgAmount: imgAmount,
+        xhrload: xhrload,
+        xhrDNSQuery: xhrDNSQuery,
+        xhrAmount: xhrAmount
+    }
+        
+    //页面加载信息，分为三个字段上报：页面整体加载时间，DNS 查询时间，TTFB
+    ga('send', 'timing', 'pageload', 'load', loadInfo.LoadTime);
+    ga('send', 'timing', 'pageload', 'DNSQuery', loadInfo.DNSQuery);
+    ga('send', 'timing', 'pageload', 'TTFB', loadInfo.TTFB);
+    //静态资源上报: Js 加载时间，DNS 查询时间，TTFB 时间以及 js 文件个数
+    // 样式表 加载时间， DNS 查询时间， TTFB， stylesheel 文件个数
+    // 图片 加载时间， DNS 查询时间， 图片个数
+    if(sourceInfo) {
         ga('send', 'timing', 'entries', 'js loadtime', sourceTime.jsLoad);
         ga('send', 'timing', 'entries', 'js DNSQuery', sourceTime.jsDNSQuery);
         ga('send', 'timing', 'entries', 'js Amount', sourceTime.jsAmount);
@@ -208,5 +219,8 @@
         ga('send', 'timing', 'entries', 'img loadtime', sourceTime.imgLoad);
         ga('send', 'timing', 'entries', 'img DNSQuery', sourceTime.imgDNSQuery);
         ga('send', 'timing', 'entries', 'img Amount', sourceTime.imgAmount);
-     });
+        ga('send', 'timing', 'entries', 'xhr load', sourceTime.xhrload);
+        ga('send', 'timing', 'entries', 'xhr DNSQuery', sourceTime.xhrDNSQuery);
+        ga('send', 'timing', 'entries', 'xhr Amount', sourceTime.xhrAmount);
+    }
 })();
