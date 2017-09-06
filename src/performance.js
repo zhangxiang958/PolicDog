@@ -61,6 +61,24 @@
         return null;
     }
 
+    function getLocation(local){
+        if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position){
+                local = position;
+            });
+        } else {
+            return void 0;
+        }
+    }
+
+    function getNetworkType() {
+        if(navigator.connection) {
+            return navigator.connection.type;
+        } else {
+            return void 0;
+        }
+    }
+
     var perf = (function(){
         var perf = null;
         
@@ -182,17 +200,21 @@
     /**
      * send data
      */
-     addHandler('loaded', function(){
+    addHandler('loaded', function(){
         if(getCookie('lastReport')) {
             return;
         }
         var scripts         = document.getElementsByTagName('script');
         var thisScriptSrc   = scripts[scripts.length - 1].src; 
         var pid             = thisScriptSrc.slice(thisScriptSrc.indexOf('?') + 1).split('=')[1];
-        
+        var network         = getNetworkType();
         var currentURL      = window.location.href;
+        var address;
+        getLocation(address);
 
         var perfData        = webPerf.minimize();
+        perfData.address    = address.coords ? address.coords.altitude + ',' + address.coords.longitude : void 0;
+        perfData.network    = network;
         perfData.pid        = pid;
         perfData.currentURL = currentURL;
         perfData.timestamp  = new Date().getTime();
@@ -203,5 +225,5 @@
         
         //设置最后一次上报数据时间, 一天上报一次
         setCookie('lastReport', new Date().getTime(), 1);
-     });
+    });
 })();
